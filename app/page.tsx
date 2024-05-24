@@ -86,7 +86,7 @@ export default function Home() {
           } else if (drop.id > id+1) {
               return {...drop, isShown: false, selected: null, options: null};
           } else if (drop.id === id+1) {
-              return {...drop, isShown: true, isBold: true, selected: artist, options: finalOptions};
+              return {...drop, isShown: true, isBold: true, selected: artist, options: finalOptions };
               }
               return {...drop, isBold: true};
         } else {
@@ -145,6 +145,7 @@ export default function Home() {
   };
 
   useEffect(() => {
+
     // set nodes
     const optionLists = dropState.map(drop => {
       return drop.options;
@@ -162,29 +163,33 @@ export default function Home() {
       return node.id;
     });
     
-    // PROBLEM: linkList doesn't include node ids of the selected values in the filter after the second dropdown is selected
+    // PROBLEM: When D3 component is being passed props linkList doesn't include node ids of the selected values in the dropdowns.
     // even though these node ids are present in the 'nodeIds' variable above.
-    // I suspect updating of DropState is causing the problem
+    // Also only the links relevant to the last dropdown value chosen appear in the links useState.
+    // When D3 component is not involved linkList includes all node ids and therefore setLinks updates perfect.
+    
     const linkList = linksData.filter(link => {
-      return nodeIds.includes(link.source || link.target);
+      return nodeIds.includes(link.source) || nodeIds.includes(link.target);
     });
      
-    // my aim is to ONLY set the links that coincide with the nodes selected AND the nodes within the options of the dropdowns.
-    // but my method used below is only returning the links of the last selected node. 
     const unwantedLinks = linkList.filter(link => {
-      return !nodeIds.includes(link.target);
+      return !nodeIds.includes(link.source) || !nodeIds.includes(link.target);
      });
   
     const finalLinks = linkList.filter(link => {
       return !unwantedLinks.includes(link);
     });
-    
+   
     setLinks(finalLinks);
 
   }, [dropState])
  
+  console.log(nodes)
+  console.log(links)
+  
   // PROBLEM: i want to restore the dropdowns colour(isBold) after a loop is found and the user starts again. 
   // but this method is changing dropState, therefore triggering the set nodes useEffect and rerendering the map everytime a dropdown is opened. 
+ 
   function handleOpen(id: number) {
     setDropState(prevDropState => {
       return prevDropState.map(drop => {
@@ -212,11 +217,11 @@ export default function Home() {
       <Playlist 
       recordState={playlistState}/>
     </ul>
-    <div className="starMap">
+    {/* <div className="starMap">
       {!seeIntroduction && <StarMap
       nodes={nodes}
       links={links} />}
-    </div>
+    </div> */}
   </div>
   )
 }

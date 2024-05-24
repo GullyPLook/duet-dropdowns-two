@@ -4,6 +4,9 @@ import * as d3 from "d3";
 
 export default function StarMap({nodes, links}) {
 
+  console.log(nodes)
+  console.log(links)
+
     const chartRef = useRef();
     const [width, setWidth] = useState(1400);
     const [height, setHeight] = useState(900);
@@ -135,7 +138,7 @@ export default function StarMap({nodes, links}) {
     } 
 
     });
-  }, [nodes]);
+  }, [nodes, links]);
   
     return (
         <svg
